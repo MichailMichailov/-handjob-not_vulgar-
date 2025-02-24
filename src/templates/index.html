@@ -1,12 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Air Writing</title>
 </head>
 <body>
-    <h1>Air Writing Web</h1>
-    <img src="{{ url_for('video_feed') }}" width="800">
+    <h1>Air Writing</h1>
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    
+    <script>
+        // Функция для очистки холста
+        function clearCanvas() {
+            fetch('/clear_canvas', { method: 'POST' })
+                .then(response => console.log('Canvas cleared'))
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Слушаем нажатие клавиш
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'c' || event.key === 'C') {  // Если нажата клавиша C
+                clearCanvas();
+            }else if (event.key === 's' || event.key === 'S') {  // Если нажата клавиша C
+                fetch('/get_letter', { method: 'POST' })
+                .then(response => console.log('Letter ok'))
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
 </body>
 </html>
