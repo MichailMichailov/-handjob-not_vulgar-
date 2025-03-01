@@ -3,30 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Writing</title>
+    <title>Doc</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Air Writing</h1>
-    <img src="{{ url_for('video_feed') }}" width="640" height="480">
-    
-    <script>
-        // Функция для очистки холста
-        function clearCanvas() {
-            fetch('/clear_canvas', { method: 'POST' })
-                .then(response => console.log('Canvas cleared'))
-                .catch(error => console.error('Error:', error));
-        }
-
-        // Слушаем нажатие клавиш
-        window.addEventListener('keydown', function(event) {
-            if (event.key === 'c' || event.key === 'C') {  // Если нажата клавиша C
-                clearCanvas();
-            }else if (event.key === 's' || event.key === 'S') {  // Если нажата клавиша C
-                fetch('/get_letter', { method: 'POST' })
-                .then(response => console.log('Letter ok'))
-                .catch(error => console.error('Error:', error));
-            }
-        });
-    </script>
+    <div class="wrapp">
+        <div class="top">
+            <img src="{{ url_for('video_feed') }}" width="640" height="480" class="top__screen">
+        
+            <div class="top__result">
+                <h2 class="top__result-title">expected letter</h2>
+                <div class="top__result-text">
+                    <span id="tmpRez">A</span>
+                </div>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="bottom__content">
+                <div class="bottom__content-text" id="full-text"></div>
+                <div class="bottom__content-interface">
+                    <div class="buttons">
+                        <!-- Первый блок кнопок -->
+                        <div class="button-group">
+                            <button id="save-letter">save letter</button>
+                            <button id="remove-letter">remove last letter</button>
+                        </div>
+                        <!-- Второй блок кнопок -->
+                        <div class="button-group">
+                            <button id="space">space</button>
+                            <button id="clear-screen">clear screen</button>
+                        </div>
+                        <!-- Третий блок кнопок -->
+                        <div class="button-group">
+                            <button id="start-drawing">start drawing</button>
+                            <button id="stop-drawing">stop drawing</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

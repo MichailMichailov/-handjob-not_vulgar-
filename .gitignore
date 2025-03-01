@@ -6,3 +6,4 @@ tempCodeRunnerFile.py
 .env
 venv/
 tmp/
+tests/

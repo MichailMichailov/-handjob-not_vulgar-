@@ -1,0 +1,195 @@
+/* Общие стили для всей страницы */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f9fb;
+    color: #333;
+}
+
+/* Обертка для всего контента */
+.wrapp {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Верхняя часть страницы */
+.top {
+    display: flex;
+    padding: 20px;
+    background-color: #2c3e50;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.top__screen {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    /* &:hover {
+        transform: scale(1.05);
+    } */
+}
+
+/* Результат распознавания */
+.top__result {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #ecf0f1;
+    border-radius: 10px;
+    margin-left: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #2c3e50;
+}
+
+.top__result-title {
+    font-size: 28px;
+    text-transform: capitalize;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.top__result-text {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #34495e;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #ffffff, #dfe6e9);
+    box-shadow: inset 4px 4px 6px rgba(0, 0, 0, 0.1), inset -4px -4px 6px rgba(255, 255, 255, 0.1);
+    padding: 20px;
+}
+
+.top__result-text span {
+    font-size: 80px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Нижняя часть страницы */
+.bottom {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Контейнер для контента снизу */
+.bottom__content {
+    display: flex;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+}
+
+/* Текстовый блок */
+.bottom__content-text {
+    background-color: #f1f2f6;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 15px;
+    flex: 0 0 40%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: #333;
+    overflow-y: auto; /* Прокрутка текста */
+}
+
+/* Контейнер интерфейса с кнопками */
+.bottom__content-interface {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Распределение элементов по вертикали */
+    align-items: flex-start;
+}
+
+/* Разделение кнопок на 3 блока */
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+/* Группа кнопок */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+/* Общие стили для кнопок */
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    text-align: center;
+    width: 100%; /* Все кнопки растягиваются на всю ширину родителя */
+    height: 50px; /* Фиксированная высота для всех кнопок */
+    max-width: 180px; /* Максимальная ширина */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-transform: capitalize;
+}
+
+/* Контейнер для групп кнопок */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Расстояние между кнопками */
+    width: 100%;
+}
+
+/* Эффект наведения и клика */
+button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+button:active {
+    background-color: #1c5985;
+}
+
+/* Разные цвета кнопок */
+button#save-letter, button#remove-letter {
+    background-color: #9b59b6;
+}
+
+button#space, button#clear-screen {
+    background-color: #2ecc71;
+}
+
+button#start-drawing, button#stop-drawing {
+    background-color: #f39c12;
+}
+
+/* Эффект наведения */
+button#save-letter:hover, button#remove-letter:hover {
+    background-color: #8e44ad;
+}
+
+button#space:hover, button#clear-screen:hover {
+    background-color: #27ae60;
+}
+
+button#start-drawing:hover, button#stop-drawing:hover {
+    background-color: #e67e22;
+}

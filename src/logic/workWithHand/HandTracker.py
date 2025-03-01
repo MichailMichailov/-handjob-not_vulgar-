@@ -22,8 +22,9 @@ class HandTracker:
                 return x, y
         return None
     
-    def fist_detect(self, results ):
+    def fist_detect(self, frame ):
         """Возвращает истину если найден кулак"""
+        results = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 # self.mp_draw.draw_landmarks(frame, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
@@ -47,7 +48,7 @@ class HandTracker:
                         break
 
                 return is_fist if True else False
-        return None
+        return False
  
     def is_thumb_up(self, results):
         """ Определяет, поднят ли большой палец вверх """

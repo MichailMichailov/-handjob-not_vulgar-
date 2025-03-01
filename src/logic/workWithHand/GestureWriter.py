@@ -85,7 +85,7 @@ class GestureWriter:
         prediction = self.model.predict(self.normalize_image(data))
         predicted_class = np.argmax(prediction)
         confidence = np.max(prediction) 
-        return emnist_labels[predicted_class] if confidence > 0.7 else 'None'
+        return emnist_labels[predicted_class], confidence
 
     def normalize_image(self, data):
         """Конвертирует траекторию в изображение"""
@@ -99,6 +99,6 @@ class GestureWriter:
     def recognize_letters(self, data):
         s = ''
         for e in data:
-            s+=self.recognize_letter(e)
-        return s
+            s+=self.recognize_letter(e)[0]
+        return s, 0
         
