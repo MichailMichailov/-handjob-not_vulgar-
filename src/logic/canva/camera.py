@@ -1,15 +1,22 @@
-
+# Импортируем OpenCV для работы с видеопотоком
 import cv2
+# Импортируем типы для аннотации функций
 from typing import List, Dict, Tuple, Set
 
+# Функция не используется - оставлена для возможного расширения функционала программы
+def find_cameras(max_cameras: int = 2) -> List[Dict[str, str]]:
+    """
+    Функция для поиска доступных камер в системе.
 
-def find_cameras(max_cameras:int=2)->List:
-    cameras = []
-    for i in range(max_cameras):
-        cap = cv2.VideoCapture(i)
-        if cap.isOpened():
-            cameras.append({'id':i, 'name': cap.getBackendName()})  # Добавляем камеру в список
-            cap.release()  # Освобождаем ресурс камеры
+    :param max_cameras: Максимальное количество индексов камер, которые проверяются (по умолчанию 2).
+    :return: Список словарей с найденными камерами, содержащий 'id' (индекс камеры) и 'name' (название бэкенда).
+    """
+    cameras = []  # Список для хранения информации о найденных камерах
+    for i in range(max_cameras):  # Проверяем камеры от 0 до max_cameras - 1
+        cap = cv2.VideoCapture(i)  # Открываем видеопоток с индексом i
+        if cap.isOpened():  # Проверяем, успешно ли открыта камера
+            cameras.append({'id': i, 'name': cap.getBackendName()})  # Добавляем информацию о камере
+            cap.release()  # Освобождаем ресурс камеры, чтобы не блокировать её
         else:
-            print(f"Не удалось открыть камеру с индексом {i}.")
-    return cameras
+            print(f"Не удалось открыть камеру с индексом {i}.")  # Выводим сообщение, если камеру не удалось открыть
+    return cameras  # Возвращаем список найденных камер
