@@ -1,80 +1,80 @@
-import joblib
+import joblib # type: ignore
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score # type: ignore
 from data.config import train_data_folder
 
 class ModelTester:
     def __init__(self, model_file, test_data_file):
-        # Загружаем модель из файла
+        # Завантажуємо модель з файлу
         self.recognizer = joblib.load(model_file)
         self.test_data_file = test_data_file
 
     def load_emnist_data(self, file_path):
-        # Загружаем данные из CSV файла
+        # Завантажуємо дані з CSV файлу
         data = pd.read_csv(file_path)
 
-        # Предполагаем, что CSV файл имеет формат:
-        # Первая колонка — это метка (например, буква), остальные — это пиксели (28x28 = 784)
-        X = data.iloc[:, 1:].values  # Все строки, все столбцы кроме первого (пиксели)
-        y = data.iloc[:, 0].values  # Первая колонка (метки)
+        # Припускаємо, що CSV файл має такий формат:
+        # Перша колонка — це мітка (наприклад, буква), інші — це пікселі (28x28 = 784)
+        X = data.iloc[:, 1:].values  # Усі рядки, всі стовпці, крім першого (пікселі)
+        y = data.iloc[:, 0].values  # Перша колонка (мітки)
 
-        # Преобразуем данные в нужный формат (например, в двумерный массив)
-        X = X.astype(np.float32)  # Преобразуем в тип float32 для дальнейших операций
-        y = y.astype(np.int32)  # Метки должны быть целыми числами
+        # Перетворюємо дані в потрібний формат (наприклад, в двовимірний масив)
+        X = X.astype(np.float32)  # Перетворюємо в тип float32 для подальших операцій
+        y = y.astype(np.int32)  # Мітки повинні бути цілими числами
 
         return X, y
 
     def test_model(self):
-        # Загружаем тестовые данные
+        # Завантажуємо тестові дані
         X_test, y_test = self.load_emnist_data(self.test_data_file)
 
-        # Прогнозируем метки для тестовых данных
+        # Прогнозуємо мітки для тестових даних
         y_pred = self.recognizer.predict(X_test)
 
-        # Оценка точности
+        # Оцінка точності
         accuracy = accuracy_score(y_test, y_pred)
-        print(f"Accuracy on test data: {accuracy * 100:.2f}%")
+        print(f"Точність на тестових даних: {accuracy * 100:.2f}%")
 
-        # Проверяем несколько предсказаний вручную
+        # Перевіряємо кілька випадкових передсказань вручну
         self.check_random_predictions(X_test, y_test)
 
-        # Визуализируем ошибки
+        # Візуалізуємо помилки
         self.visualize_errors(X_test, y_test, y_pred)
 
     def check_random_predictions(self, X_test, y_test):
-        print("\nTesting some random predictions:\n")
-        for i in range(5):  # Покажем первые 5 случайных примеров
+        print("\nПеревірка кількох випадкових передсказань:\n")
+        for i in range(5):  # Показуємо перші 5 випадкових прикладів
             sample_image = X_test[i]
             true_label = y_test[i]
             predicted_label = self.recognizer.predict([sample_image])[0]
 
-            print(f"True label: {true_label}, Predicted label: {predicted_label}")
+            print(f"Правильна мітка: {true_label}, Прогнозована мітка: {predicted_label}")
 
-            # Визуализируем изображение
+            # Візуалізуємо зображення
             plt.imshow(sample_image.reshape(28, 28), cmap="gray")
-            plt.title(f"True: {true_label}, Pred: {predicted_label}")
+            plt.title(f"Правильна: {true_label}, Прогнозована: {predicted_label}")
             plt.show()
 
     def visualize_errors(self, X_test, y_test, y_pred):
-        # Визуализируем изображения, где модель ошиблась
+        # Візуалізуємо зображення, де модель помилилася
         incorrect_indices = [i for i in range(len(y_test)) if y_pred[i] != y_test[i]]
 
         if incorrect_indices:
-            print("\nVisualizing errors (up to 5 images):\n")
+            print("\nВізуалізація помилок (до 5 зображень):\n")
             for idx in incorrect_indices[:5]:
                 plt.imshow(X_test[idx].reshape(28, 28), cmap="gray")
-                plt.title(f"True: {y_test[idx]}, Pred: {y_pred[idx]}")
+                plt.title(f"Правильна: {y_test[idx]}, Прогнозована: {y_pred[idx]}")
                 plt.show()
         else:
-            print("No errors in the predictions!")
+            print("Немає помилок у передсказаннях!")
 
 if __name__ == "__main__":
-    # Укажи путь к сохраненному файлу модели и CSV файлу с тестовыми данными
+    # Вкажіть шлях до збереженого файлу моделі та CSV файлу з тестовими даними
     model_file = f'{train_data_folder}\\model.pkl'
     test_data_file = f'{train_data_folder}\\emnist-balanced-test.csv'
 
-    # Создаем экземпляр тестера и выполняем проверку
+    # Створюємо екземпляр тестера і виконуємо перевірку
     tester = ModelTester(model_file, test_data_file)
     tester.test_model()

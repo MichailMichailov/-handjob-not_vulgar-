@@ -3,48 +3,49 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFilter
-from tensorflow.keras.models import Sequential, load_model # type: ignore
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout # type: ignore
-from tensorflow.keras.utils import to_categorical # type: ignore
-from data.config import train_data_folder, emnist_labels  # Пути к данным
+from tensorflow.keras.models import Sequential, load_model  # type: ignore
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout  # type: ignore
+from tensorflow.keras.utils import to_categorical  # type: ignore
+from data.config import train_data_folder, emnist_labels  # Шляхи до даних
 
-# Функция загрузки данных
+# Функція завантаження даних
 def load_emnist_data(data_path):
-    """Загружает и подготавливает данные EMNIST"""
-    print(f'Загрузка данных из {data_path}...')
+    """Завантажує та готує дані EMNIST"""
+    print(f'Завантаження даних з {data_path}...')
     df = pd.read_csv(data_path, header=None)
-    y = df.iloc[:, 0].values  # Метки классов (первый столбец)
-    X = df.iloc[:, 1:].values  # Остальные столбцы - пиксели
-    X = X.reshape(-1, 28, 28, 1).astype("float32") / 255.0  # Нормализация
+    y = df.iloc[:, 0].values  # Мітки класів (перший стовпець)
+    X = df.iloc[:, 1:].values  # Інші стовпці - пікселі
+    X = X.reshape(-1, 28, 28, 1).astype("float32") / 255.0  # Нормалізація
     return X, y
-# Визуализация нескольких изображений из датасета
+
+# Візуалізація кількох зображень із датасету
 def show_sample_images(X, y, num_samples=5):
     t = 0
     for i in range(len(X)):
         if(y[i] == 10):
-            image = X[i].reshape(28, 28).T  # Преобразуем в 28x28 (EMNIST использует этот размер)
+            image = X[i].reshape(28, 28).T  # Перетворюємо в 28x28 (EMNIST використовує цей розмір)
             plt.imshow(image, cmap='gray')
-            plt.title(f"Тестовое изображение, метка: {y[i]} - {emnist_labels[y[i]]}")
+            plt.title(f"Тестове зображення, мітка: {y[i]} - {emnist_labels[y[i]]}")
             plt.show()
             t += 1
         if t == num_samples:
             break
 
-
-# Пути к файлам
+# Шляхи до файлів
 train_file = f"{train_data_folder}\\emnist-byclass-train.csv"
 test_file = f"{train_data_folder}\\emnist-byclass-test.csv"
 model_file = "emnist_cnn_model.h5"
-# # Загружаем данные
+
+# Завантажуємо дані
 # X_train, y_train = load_emnist_data(train_file)
 # X_test, y_test = load_emnist_data(test_file)
-# # Преобразуем метки классов в one-hot encoding
-# num_classes = len(set(y_train))  # Определяем количество классов
+# # Перетворюємо мітки класів в one-hot encoding
+# num_classes = len(set(y_train))  # Визначаємо кількість класів
 # y_train_categorical = to_categorical(y_train, num_classes=num_classes)
 # y_test_categorical = to_categorical(y_test, num_classes=num_classes)
 
 # # show_sample_images(X_train, y_train)
-# # Создание нейросети
+# # Створення нейромережі
 # model = Sequential([
 #     Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
 #     MaxPooling2D((2, 2)),
@@ -56,62 +57,61 @@ model_file = "emnist_cnn_model.h5"
 #     Dense(num_classes, activation='softmax')
 # ])
 
-# # Компиляция модели
+# # Компіляція моделі
 # model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-# # Обучение модели
-# print("Начинаем обучение...")
+# # Навчання моделі
+# print("Починаємо навчання...")
 # model.fit(X_train, y_train_categorical, epochs=10, batch_size=128, validation_data=(X_test, y_test_categorical))
-# # Оценка точности на тестовых данных
+# # Оцінка точності на тестових даних
 # test_loss, test_acc = model.evaluate(X_test, y_test_categorical)
-# print(f'Точность на тестовых данных: {test_acc:.4f}')
-# # Сохранение модели
+# print(f'Точність на тестових даних: {test_acc:.4f}')
+# # Збереження моделі
 # model.save("emnist_cnn_model.h5")
-# print("Модель сохранена.")
-
+# print("Модель збережена.")
 
 def predict_image(image_path, model):
     """
-    Загружает изображение, подготавливает его для модели и делает предсказание.
+    Завантажує зображення, готує його для моделі та робить передбачення.
     """
     image = Image.open(image_path).convert('L')
-    image = image.resize((28, 28))  # Приводим к стандартному размеру
+    image = image.resize((28, 28))  # Приводимо до стандартного розміру
 
-    # Преобразуем в numpy-массив и нормализуем
+    # Перетворюємо в numpy-масив і нормалізуємо
     image = np.array(image) / 255.0
-    image = image.reshape(1, 28, 28, 1)  # Приводим к формату модели
+    image = image.reshape(1, 28, 28, 1)  # Приводимо до формату моделі
 
-    # Визуализируем изображение перед подачей в модель
+    # Візуалізуємо зображення перед подачею в модель
     plt.imshow(image.reshape(28, 28), cmap='gray')
-    plt.title("Изображение перед предсказанием")
+    plt.title("Зображення перед передбаченням")
     plt.axis("off")
     plt.show()
 
-    # Делаем предсказание
+    # Робимо передбачення
     prediction = model.predict(image)
-    predicted_label = np.argmax(prediction)  # Индекс класса с наибольшей вероятностью
-    confidence = np.max(prediction)  # Уверенность предсказания
+    predicted_label = np.argmax(prediction)  # Індекс класу з найбільшою ймовірністю
+    confidence = np.max(prediction)  # Впевненість передбачення
 
-    # Выводим результат
-    print(f"Предсказанный символ: {emnist_labels.get(predicted_label, '?')} ({predicted_label})  (уверенность {confidence:.2f})")
+    # Виводимо результат
+    print(f"Передбачений символ: {emnist_labels.get(predicted_label, '?')} ({predicted_label})  (впевненість {confidence:.2f})")
     return emnist_labels.get(predicted_label, '?'), confidence  
 
 def create_and_save_image(coords, model, filename="symbol.png"):
     """
-    Создает изображение из набора координат и предсказывает символ.
+    Створює зображення з набору координат і передбачає символ.
     """
     if not coords:
-        print("Ошибка: список координат пуст!")
+        print("Помилка: список координат порожній!")
         return None
 
-    # Определяем границы символа
+    # Визначаємо межі символу
     x_coords, y_coords = zip(*coords)
     x_min, x_max = min(x_coords), max(x_coords)
     y_min, y_max = min(y_coords), max(y_coords)
 
-    # Масштабируем координаты в диапазон (0, 27)
+    # Масштабуємо координати в діапазон (0, 27)
     scale = max(x_max - x_min, y_max - y_min)
     if scale == 0:
-        print("Ошибка: символ слишком маленький!")
+        print("Помилка: символ занадто маленький!")
         return None
 
     norm_coords = [
@@ -119,31 +119,30 @@ def create_and_save_image(coords, model, filename="symbol.png"):
         for x, y in coords
     ]
 
-    # Создаём 28x28 изображение (чёрный фон)
+    # Створюємо 28x28 зображення (чорний фон)
     image = Image.new("L", (28, 28), 0)
     draw = ImageDraw.Draw(image)
 
-    # Рисуем точки (белым цветом)
+    # Малюємо точки (білим кольором)
     for x, y in norm_coords:
         draw.ellipse((x, y, x + 1, y + 1), fill=255)
 
-    # Применяем размытие для естественности
+    # Застосовуємо розмивання для природності
     image = image.filter(ImageFilter.GaussianBlur(1))
 
-    # Сохраняем изображение
+    # Зберігаємо зображення
     image.save(filename)
-    print(f"Изображение сохранено как {filename}")
+    print(f"Зображення збережено як {filename}")
 
-    # Визуализируем
+    # Візуалізуємо
     plt.imshow(image, cmap='gray')
     plt.axis("off")
     plt.show()
 
-    # Предсказание
+    # Передбачення
     return predict_image(filename, model)
 
-
-# Загружаем модель
+# Завантажуємо модель
 model = load_model("emnist_cnn_model.h5")
 
 # Тестовый набор координат
@@ -154,19 +153,19 @@ image_data = np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 # image_data = np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,81,125,77,0,0,0,0,0,0,1,19,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,159,232,249,206,10,0,0,0,0,0,34,201,207,90,1,0,0,0,0,0,0,0,0,0,0,0,24,170,254,254,254,253,113,4,0,0,0,0,84,233,253,218,19,0,0,0,0,0,0,0,0,0,2,11,131,234,254,255,255,254,127,4,0,0,0,2,170,251,254,233,20,0,0,0,0,0,0,0,0,0,66,139,244,254,255,255,255,254,127,4,0,0,0,2,173,252,254,217,4,0,0,0,0,0,0,0,7,59,232,254,254,254,254,254,255,254,129,5,0,0,0,2,174,252,254,217,4,0,0,0,0,0,0,0,90,207,254,254,254,236,236,254,255,254,170,20,0,0,0,4,217,254,254,217,4,0,0,0,0,0,7,36,221,254,254,247,202,79,129,250,255,254,140,9,0,0,0,4,217,254,254,222,9,0,0,0,0,1,90,203,249,254,245,164,34,7,127,250,255,254,129,5,0,0,0,4,217,254,254,249,37,0,0,0,6,79,245,254,254,250,95,9,0,0,125,249,255,254,203,32,0,0,0,4,203,254,255,250,37,0,0,3,111,189,254,254,251,187,20,0,0,0,82,232,254,254,217,39,0,0,0,0,129,250,255,250,39,0,3,79,247,254,254,251,131,32,0,0,0,0,8,127,254,255,229,70,0,0,0,0,114,245,255,252,82,3,48,176,254,254,253,218,23,0,0,0,0,0,0,51,250,255,234,84,0,0,0,0,38,216,254,254,148,100,244,254,254,246,127,33,0,0,0,0,0,0,0,32,245,254,250,127,0,0,0,0,21,172,254,254,236,235,254,254,250,175,10,0,0,0,0,0,0,0,0,9,220,254,250,140,0,0,0,0,4,125,254,255,255,255,254,251,100,20,0,0,0,0,0,0,0,0,0,0,109,239,253,184,3,0,0,0,2,82,252,254,255,254,253,218,22,0,0,0,0,0,0,0,0,0,0,0,115,245,254,205,4,0,0,0,0,34,243,254,255,254,221,91,1,0,0,0,0,0,0,0,0,0,0,0,109,232,254,217,4,0,0,0,0,1,123,232,253,232,78,3,0,0,0,0,0,0,0,0,0,0,0,0,4,79,213,153,2,0,0,0,0,0,22,126,202,95,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,36,20,0,0,0,0,0,0,0,2,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
 image_data = image_data.reshape(28, 28)
-# Нормализация
+# Нормалізація
 image_data = image_data.astype("float32") / 255.0
-# Добавляем размерность канала (для Conv2D)
+# Додаємо розмірність каналу (для Conv2D)
 image_data = np.expand_dims(image_data, axis=-1)  # (28, 28, 1)
-# Добавляем размерность batch (т.к. модель ожидает (batch_size, 28, 28, 1))
+# Додаємо розмірність batch (оскільки модель очікує (batch_size, 28, 28, 1))
 image_data = np.expand_dims(image_data, axis=0)  # (1, 28, 28, 1)
-# Проверяем размерность перед подачей в модель
-prediction = model.predict(image_data.T)  # Получаем вектор предсказаний
-# Индекс с наибольшей вероятностью - это и есть буква
+# Перевіряємо розмірність перед подачею в модель
+prediction = model.predict(image_data.T)  # Отримуємо вектор передбачень
+# Індекс з найбільшою ймовірністю - це й є буква
 predicted_class = np.argmax(prediction)
-print(f"Предсказанная буква: {predicted_class}")
+print(f"Передбачена буква: {predicted_class}")
 
-image = image_data.reshape(28, 28)  # Преобразуем в 28x28 (EMNIST использует этот размер)
+image = image_data.reshape(28, 28)  # Перетворюємо в 28x28 (EMNIST використовує цей розмір)
 plt.imshow(image, cmap='gray')
-plt.title(f"Тестовое изображение, метка: {predicted_class} - {emnist_labels[predicted_class]} ({np.max(prediction)})")
+plt.title(f"Тестове зображення, мітка: {predicted_class} - {emnist_labels[predicted_class]} ({np.max(prediction)})")
 plt.show()

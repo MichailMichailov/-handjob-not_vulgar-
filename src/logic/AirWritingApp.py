@@ -1,65 +1,65 @@
-import cv2 # Импорт библиотеки OpenCV для обработки изображений и видео
-from logic.workWithHand.GestureWriter import GestureWriter  # Импорт класса для распознавания текста нейросетью
-from logic.workWithHand.HandTracker import HandTracker  # Импорт класса для отслеживания положения рук
-from logic.canva.DrawingCanvas import DrawingCanvas  # Импорт класса для рисования на холсте
-from data.config import train_data_folder  # Импорт путей к файлам конфигурации
+import cv2  # Імпорт бібліотеки OpenCV для обробки зображень та відео
+from logic.workWithHand.GestureWriter import GestureWriter  # Імпорт класу для розпізнавання тексту нейромережею
+from logic.workWithHand.HandTracker import HandTracker  # Імпорт класу для відстеження положення рук
+from logic.canva.DrawingCanvas import DrawingCanvas  # Імпорт класу для малювання на полотні
+from data.config import train_data_folder  # Імпорт шляхів до файлів конфігурації
 
 class AirWritingApp:
-    """Главный клас логики программы"""
+    """Головний клас логіки програми"""
     def __init__(self):
-        """ Инициализация """
-        self.cap = cv2.VideoCapture(0) # Открытие видеопотока с камеры по умолчанию
-        self.tracker = HandTracker() # Инициализация трекера рук
-        self.canvas = None # Переменная для холста, на котором будет рисоваться
-        self.writer = GestureWriter(train_data_folder) # Инициализация распознавателя жестов
-        self.is_write = True # Флаг для включения/выключения режима рисования
+        """Ініціалізація"""
+        self.cap = cv2.VideoCapture(0)  # Відкриття відеопотоку з камери за замовчуванням
+        self.tracker = HandTracker()  # Ініціалізація трекера рук
+        self.canvas = None  # Змінна для полотна, на якому буде малюватися
+        self.writer = GestureWriter(train_data_folder)  # Ініціалізація розпізнавача жестів
+        self.is_write = True  # Прапор для включення/виключення режиму малювання
 
     def set_is_write(self, value: bool):
-        """ Устанавливает флаг рисования. """
+        """Встановлює прапор малювання."""
         self.is_write = value
 
     def generate_frames(self):
         """
-        Генерирует кадры для видеопотока с обработанным изображением.
+        Генерує кадри для відеопотоку з обробленим зображенням.
 
-        Возвращает:
-        - Генератор: каждый кадр в виде JPEG изображения.
+        Повертає:
+        - Генератор: кожен кадр у вигляді JPEG зображення.
         """
         while True:
-            ret, frame = self.cap.read() # Чтение кадра из видеопотока
-            if not ret:  # Если кадр не получен, выходим
+            ret, frame = self.cap.read()  # Читання кадру з відеопотоку
+            if not ret:  # Якщо кадр не отримано, виходимо
                 break
-            frame = cv2.flip(frame, 1)  # Зеркальное отображение изображения по горизонтали
-            h, w, _ = frame.shape  # Получаем размеры кадра
-            if self.canvas is None: # Если холст ещё не создан, создаём его
+            frame = cv2.flip(frame, 1)  # Дзеркальне відображення зображення по горизонталі
+            h, w, _ = frame.shape  # Отримуємо розміри кадру
+            if self.canvas is None:  # Якщо полотно ще не створено, створюємо його
                 self.canvas = DrawingCanvas(400, 400)
 
-            if (not self.tracker.fist_detect(frame)) and self.is_write: # Если не обнаружен кулак и рисование включено
-                finger_pos = self.tracker.get_finger_position(frame) # Получаем координаты указательного пальца
-                if finger_pos: # Если координаты пальца найдены
-                    x, y = finger_pos  # Извлекаем координаты
-                    self.canvas.draw_line(x, y) # Рисуем линию на холсте по координатам
+            if (not self.tracker.fist_detect(frame)) and self.is_write:  # Якщо кулак не виявлений і малювання увімкнене
+                finger_pos = self.tracker.get_finger_position(frame)  # Отримуємо координати вказівного пальця
+                if finger_pos:  # Якщо координати пальця знайдені
+                    x, y = finger_pos  # Витягуємо координати
+                    self.canvas.draw_line(x, y)  # Малюємо лінію на полотні по координатах
             else:
-                self.canvas.clear_prev() # Если обнаружен кулак, очищаем предыдущие координаты
-            canvas_img = self.canvas.get_canvas() # Получаем изображение холста
-            # Проверяем количество каналов (избегаем ошибки OpenCV)
-            if len(canvas_img.shape) == 2:  # Если изображение холста в градациях серого (1 канал)
-                canvas_bgr = cv2.cvtColor(canvas_img, cv2.COLOR_GRAY2BGR) # Преобразуем в 3 канала (цветное изображение)
+                self.canvas.clear_prev()  # Якщо кулак виявлений, очищуємо попередні координати
+            canvas_img = self.canvas.get_canvas()  # Отримуємо зображення полотна
+            # Перевіряємо кількість каналів (уникаємо помилки OpenCV)
+            if len(canvas_img.shape) == 2:  # Якщо зображення полотна в градаціях сірого (1 канал)
+                canvas_bgr = cv2.cvtColor(canvas_img, cv2.COLOR_GRAY2BGR)  # Перетворюємо в 3 канали (кольорове зображення)
             else:
-                canvas_bgr = canvas_img  # Если изображение уже цветное, просто используем его
+                canvas_bgr = canvas_img  # Якщо зображення вже кольорове, просто використовуємо його
             
-            # Размеры канваса
+            # Розміри полотна
             ch, cw, _ = canvas_bgr.shape
             x_offset = (w - cw) // 2
             y_offset = (h - ch) // 2
-            # Вставляем холст по центру
+            # Вставляємо полотно по центру
             frame[y_offset:y_offset + ch, x_offset:x_offset + cw] = canvas_bgr
-            # Код для отправки изображения в виде потока
-            _, buffer = cv2.imencode('.jpg', frame) # Кодируем кадр в формат JPEG
-            frame_bytes = buffer.tobytes() # Преобразуем в байты для отправки по сети
+            # Код для відправки зображення у вигляді потоку
+            _, buffer = cv2.imencode('.jpg', frame)  # Кодуємо кадр у формат JPEG
+            frame_bytes = buffer.tobytes()  # Перетворюємо в байти для відправки по мережі
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')  # Отправка кадра как части HTTP-ответа
- 
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')  # Відправка кадру як частини HTTP-відповіді
+
 
 
 
